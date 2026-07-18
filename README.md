@@ -40,6 +40,80 @@ Options:
 
 ```
 
+## Docker
+
+Docker Compose builds the tool with Node.js 22 and mounts the local `./data`
+directory at `/data` in the container. Files downloaded to `/data` remain
+available on the host after the container exits.
+
+### Build the image
+
+```bash
+mkdir -p data
+docker compose build
+```
+
+Show the CLI help:
+
+```bash
+docker compose run --rm nexus-migration
+```
+
+### Download artifacts
+
+```bash
+docker compose run --rm nexus-migration \
+  download \
+  --url https://nexus.example.com \
+  --user USERNAME \
+  --pass PASSWORD \
+  --output /data/artifacts \
+  --index /data/index.json
+```
+
+To limit the download to specific repositories, append one or more repository
+names after `--include-repo`. Use `--ignore-repo` instead to exclude
+repositories.
+
+### Upload artifacts
+
+```bash
+docker compose run --rm nexus-migration \
+  upload \
+  --url https://target-nexus.example.com \
+  --user USERNAME \
+  --pass PASSWORD \
+  --index-path /data/index.json \
+  --artifact-dir-path /data/artifacts
+```
+
+An optional repository mapping file stored under `./data` can be supplied with
+`--repository-mapper /data/repository-mapper.json`.
+
+### Run commands inside the container
+
+Start an interactive shell while retaining the `/data` mount:
+
+```bash
+docker compose run --rm --entrypoint sh nexus-migration
+```
+
+From the container shell, invoke the tool directly:
+
+```sh
+node /app/bin/cli.js --help
+
+node /app/bin/cli.js download \
+  --url https://nexus.example.com \
+  --user USERNAME \
+  --pass PASSWORD \
+  --output /data/artifacts \
+  --index /data/index.json
+```
+
+Type `exit` to stop and remove the temporary container. Files written beneath
+`/data` are retained in the host's `./data` directory.
+
 ## Author
 
 👤 **Raz Luvaton**
