@@ -1,0 +1,11 @@
+services:
+  nexus-migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nexus-migration-util:local
+    volumes:
+      - ./data:/data
+    working_dir: /data
+    command: ["--help"]
+    restart: "no"
